@@ -25,7 +25,7 @@ public class CriptografiaApp {
         frame.add(panel);
         placeComponents(panel);
 
-        frame.setSize(400, 250);
+        frame.setSize(400, 300);
         frame.setVisible(true);
 
     }
@@ -49,16 +49,22 @@ public class CriptografiaApp {
         inputTextField.setBounds(70, 60, 165, 25);
         panel.add(inputTextField);
 
-        JLabel inputLabel1 = new JLabel("Resultado:");
-        inputLabel1.setBounds(10, 150, 80, 25);
+        JLabel inputLabel1 = new JLabel("Enc.simétrica/assiétrica:");
+        inputLabel1.setBounds(10, 150, 150, 25);
         panel.add(inputLabel1);
 
         JTextField inputTextField1 = new JTextField(20);
-        inputTextField1.setBounds(100, 150, 200, 25);
+        inputTextField1.setBounds(150, 150, 200, 25);
         panel.add(inputTextField1);
 
 
+        JLabel inputLabel2 = new JLabel("Hashing:");
+        inputLabel2.setBounds(10, 200, 120, 25);
+        panel.add(inputLabel2);
 
+        JTextField inputTextField2 = new JTextField(20);
+        inputTextField2.setBounds(150, 200, 200, 25);
+        panel.add(inputTextField2);
 
         /*AdaptiveWidthTextField inputTextField1 = new AdaptiveWidthTextField(encryptedText);
         inputTextField1.setAlignmentX(30);
@@ -85,6 +91,7 @@ public class CriptografiaApp {
                 String inputText = inputTextField.getText();
                 String hashedText = hashText(inputText);
                 System.out.println("Texto com hash: " + hashedText);
+                inputTextField2.setText(hashedText);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -105,7 +112,7 @@ public class CriptografiaApp {
                     keyPair = generateAsymmetricKeyPair();
                     encryptedText = encryptAsymmetric(inputText, keyPair.getPublic());
                     System.out.println("Texto criptografado: " + encryptedText);
-
+                    inputTextField1.setText(encryptedText);
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
