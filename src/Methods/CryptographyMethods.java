@@ -4,17 +4,9 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
-import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.Base64;
-
-
-/*import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
-import org.apache.commons.compress.utils.IOUtils;
-*/
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,6 +19,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Signature;
 
 
 public class CryptographyMethods {
@@ -86,6 +83,32 @@ public class CryptographyMethods {
         byte[] decrypted = cipher.doFinal(Base64.getDecoder().decode(cipherText));
         return new String(decrypted);
     }
+    public static KeyPair generateKeyPair() throws Exception {
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        keyPairGenerator.initialize(2048);
+        return keyPairGenerator.generateKeyPair();
+    }
+
+    public static byte[] signData(byte[] data, PrivateKey privateKey) throws Exception {
+        Signature signature = Signature.getInstance("SHA256withRSA");
+        signature.initSign(privateKey);
+        signature.update(data);
+        return signature.sign();
+    }
+
+    public static boolean verifySignature(byte[] data, byte[] signatureData, PublicKey publicKey) throws Exception {
+        Signature signature = Signature.getInstance("SHA256withRSA");
+        signature.initVerify(publicKey);
+        signature.update(data);
+        return signature.verify(signatureData);
+    }
+
+
+
+
+
+
+
     /* public static void createTarFile(List<File> files, File outputFile) throws IOException {
         try (OutputStream outputStream = new FileOutputStream(outputFile);
              BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream);

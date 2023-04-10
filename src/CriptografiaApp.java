@@ -19,17 +19,11 @@ public class CriptografiaApp {
     private static IvParameterSpec iv;
     private static KeyPair keyPair;
     private static String encryptedText;
+    private static JFrame frame;
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame("Aplicativo de Criptografia");
+        frame = new JFrame("Aplicativo de Criptografia");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        JMenuBar menuBar = new JMenuBar();
-        JMenu fileMenu = new JMenu("Arquivo");
-        JMenuItem joinFilesMenuItem = new JMenuItem("Juntar arquivos");
-        fileMenu.add(joinFilesMenuItem);
-        menuBar.add(fileMenu);
-        frame.setJMenuBar(menuBar);
 
         JPanel panel = new JPanel();
         frame.add(panel);
@@ -44,6 +38,18 @@ public class CriptografiaApp {
         /*----------------Criaçao do layout----------------*/
         panel.setLayout(null);
 
+        JMenuBar menuBar = new JMenuBar();
+        JMenu fileMenu = new JMenu("Arquivo");
+        JMenuItem joinFilesMenuItem = new JMenuItem("Juntar arquivos");
+        fileMenu.add(joinFilesMenuItem);
+        menuBar.add(fileMenu);
+
+        JMenu signatureMenu = new JMenu("Assinatura");
+        JMenuItem signMessageMenuItem = new JMenuItem("Assinar mensagem");
+        signatureMenu.add(signMessageMenuItem);
+        menuBar.add(signatureMenu);
+
+        frame.setJMenuBar(menuBar);
         JLabel label = new JLabel("Escolha o tipo de criptografia:");
         label.setBounds(10, 20, 200, 25);
         panel.add(label);
@@ -60,12 +66,12 @@ public class CriptografiaApp {
         inputTextField.setBounds(70, 60, 165, 25);
         panel.add(inputTextField);
 
-        JLabel inputLabel1 = new JLabel("Enc.simétrica/assiétrica:");
+        JLabel inputLabel1 = new JLabel("Enc.simétrica/assimétrica:");
         inputLabel1.setBounds(10, 150, 160, 25);
         panel.add(inputLabel1);
 
         JTextField inputTextField1 = new JTextField(20);
-        inputTextField1.setBounds(150, 150, 200, 25);
+        inputTextField1.setBounds(170, 150, 230, 25);
         panel.add(inputTextField1);
 
 
@@ -74,7 +80,7 @@ public class CriptografiaApp {
         panel.add(inputLabel2);
 
         JTextField inputTextField2 = new JTextField(20);
-        inputTextField2.setBounds(150, 200, 200, 25);
+        inputTextField2.setBounds(150, 200, 230, 25);
         panel.add(inputTextField2);
 
         JLabel inputLabel3 = new JLabel("Texto Desencriptado:");
@@ -82,14 +88,8 @@ public class CriptografiaApp {
         panel.add(inputLabel3);
 
         JTextField inputTextField3 = new JTextField(20);
-        inputTextField3.setBounds(150, 250, 200, 25);
+        inputTextField3.setBounds(150, 250, 230, 25);
         panel.add(inputTextField3);
-
-        /*AdaptiveWidthTextField inputTextField1 = new AdaptiveWidthTextField(encryptedText);
-        inputTextField1.setAlignmentX(30);
-        inputTextField1.setAlignmentY(150);
-        inputTextField1.getPreferredSize();
-        panel.add(inputTextField1);*/
 
 
         JButton encryptButton = new JButton("Criptografar");
@@ -172,6 +172,38 @@ public class CriptografiaApp {
 
 
         });
+
+        signMessageMenuItem.addActionListener(e -> {
+            try {
+                // Gerar par de chaves RSA
+                KeyPair keyPair = CryptographyMethods.generateKeyPair();
+                PrivateKey privateKey = keyPair.getPrivate();
+                PublicKey publicKey = keyPair.getPublic();
+
+                // Obter a mensagem do campo de texto e assiná-la
+                String message = inputTextField.getText();
+                byte[] messageBytes = message.getBytes(StandardCharsets.UTF_8);
+                byte[] signatureBytes = CryptographyMethods.signData(messageBytes, privateKey);
+
+                // Verificar a assinatura
+                boolean isValid = CryptographyMethods.verifySignature(messageBytes, signatureBytes, publicKey);
+
+                if (isValid) {
+                    String signatureString = Base64.getEncoder().encodeToString(signatureBytes);
+                    String publicKeyString = Base64.getEncoder().encodeToString(publicKey.getEncoded());
+                    System.out.println("Assinatura: " + signatureString + "\nChave pública: " + publicKeyString);
+                    JOptionPane.showMessageDialog(frame, "Mensagem assinada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                    //outputTextArea.setText("Assinatura: " + signatureString + "\nChave pública: " + publicKeyString);
+                } else {
+                    System.out.println("A assinatura não pôde ser verificada.");
+                    //outputTextArea.setText("A assinatura não pôde ser verificada.");
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(frame, "Erro ao assinar a mensagem.", "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
 
     }
 }
