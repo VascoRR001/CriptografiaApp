@@ -1,3 +1,5 @@
+import Methods.CryptographyMethods;
+
 import java.security.*;
 import java.util.Base64;
 import javax.crypto.Cipher;
@@ -17,20 +19,29 @@ public class CriptografiaApp {
     private static IvParameterSpec iv;
     private static KeyPair keyPair;
     private static String encryptedText;
+
     public static void main(String[] args) {
         JFrame frame = new JFrame("Aplicativo de Criptografia");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        JMenuBar menuBar = new JMenuBar();
+        JMenu fileMenu = new JMenu("Arquivo");
+        JMenuItem joinFilesMenuItem = new JMenuItem("Juntar arquivos");
+        fileMenu.add(joinFilesMenuItem);
+        menuBar.add(fileMenu);
+        frame.setJMenuBar(menuBar);
 
         JPanel panel = new JPanel();
         frame.add(panel);
         placeComponents(panel);
 
-        frame.setSize(400, 300);
+        frame.setSize(450, 350);
         frame.setVisible(true);
 
     }
+
     private static void placeComponents(JPanel panel) {
-                                                            /*----------------Criaçao do layout----------------*/
+        /*----------------Criaçao do layout----------------*/
         panel.setLayout(null);
 
         JLabel label = new JLabel("Escolha o tipo de criptografia:");
@@ -50,7 +61,7 @@ public class CriptografiaApp {
         panel.add(inputTextField);
 
         JLabel inputLabel1 = new JLabel("Enc.simétrica/assiétrica:");
-        inputLabel1.setBounds(10, 150, 150, 25);
+        inputLabel1.setBounds(10, 150, 160, 25);
         panel.add(inputLabel1);
 
         JTextField inputTextField1 = new JTextField(20);
@@ -65,6 +76,14 @@ public class CriptografiaApp {
         JTextField inputTextField2 = new JTextField(20);
         inputTextField2.setBounds(150, 200, 200, 25);
         panel.add(inputTextField2);
+
+        JLabel inputLabel3 = new JLabel("Texto Desencriptado:");
+        inputLabel3.setBounds(10, 250, 130, 25);
+        panel.add(inputLabel3);
+
+        JTextField inputTextField3 = new JTextField(20);
+        inputTextField3.setBounds(150, 250, 200, 25);
+        panel.add(inputTextField3);
 
         /*AdaptiveWidthTextField inputTextField1 = new AdaptiveWidthTextField(encryptedText);
         inputTextField1.setAlignmentX(30);
@@ -85,11 +104,11 @@ public class CriptografiaApp {
         hashButton.setBounds(135, 100, 100, 25);
         panel.add(hashButton);
 
-                                                            /*----------------Eventos para butoes----------------*/
+        /*----------------Eventos para butoes----------------*/
         hashButton.addActionListener(e -> {
             try {
                 String inputText = inputTextField.getText();
-                String hashedText = hashText(inputText);
+                String hashedText = CryptographyMethods.hashText(inputText);
                 System.out.println("Texto com hash: " + hashedText);
                 inputTextField2.setText(hashedText);
             } catch (Exception ex) {
@@ -103,14 +122,14 @@ public class CriptografiaApp {
                 String selectedCryptoType = (String) cryptoTypeComboBox.getSelectedItem();
 
                 if (selectedCryptoType.equals("Simétrica")) {
-                    secretKey = generateSymmetricKey();
-                    iv = generateIv();
-                    encryptedText = encryptSymmetric(inputText, secretKey, iv);
+                    secretKey = CryptographyMethods.generateSymmetricKey();
+                    iv = CryptographyMethods.generateIv();
+                    encryptedText = CryptographyMethods.encryptSymmetric(inputText, secretKey, iv);
                     System.out.println("Texto criptografado: " + encryptedText);
                     inputTextField1.setText(encryptedText);
                 } else {
-                    keyPair = generateAsymmetricKeyPair();
-                    encryptedText = encryptAsymmetric(inputText, keyPair.getPublic());
+                    keyPair = CryptographyMethods.generateAsymmetricKeyPair();
+                    encryptedText = CryptographyMethods.encryptAsymmetric(inputText, keyPair.getPublic());
                     System.out.println("Texto criptografado: " + encryptedText);
                     inputTextField1.setText(encryptedText);
                 }
@@ -125,7 +144,7 @@ public class CriptografiaApp {
                 String inputText = encryptedText;
                 String selectedCryptoType = (String) cryptoTypeComboBox.getSelectedItem();
 
-                if (!isBase64(inputText)) {
+                if (!CryptographyMethods.isBase64(inputText)) {
                     System.out.println("Texto de entrada inválido. Certifique-se de fornecer um texto criptografado em Base64.");
                     return;
                 }
@@ -134,15 +153,17 @@ public class CriptografiaApp {
                     if (secretKey == null || iv == null) {
                         System.out.println("Chave secreta ou vetor de inicialização não gerados.");
                     } else {
-                        String decryptedText = decryptSymmetric(inputText, secretKey, iv);
+                        String decryptedText = CryptographyMethods.decryptSymmetric(inputText, secretKey, iv);
                         System.out.println("Texto descriptografado: " + decryptedText);
+                        inputTextField3.setText(decryptedText);
                     }
                 } else {
                     if (keyPair == null) {
                         System.out.println("Par de chaves não gerado.");
                     } else {
-                        String decryptedText = decryptAsymmetric(inputText, keyPair.getPrivate());
+                        String decryptedText = CryptographyMethods.decryptAsymmetric(inputText, keyPair.getPrivate());
                         System.out.println("Texto descriptografado: " + decryptedText);
+                        inputTextField3.setText(decryptedText);
                     }
                 }
             } catch (Exception ex) {
@@ -153,63 +174,7 @@ public class CriptografiaApp {
         });
 
     }
-                                                /*----------------Métodos----------------*/
-    private static String hashText(String input) throws NoSuchAlgorithmException {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
-        return Base64.getEncoder().encodeToString(hash);
-    }
-
-    private static SecretKey generateSymmetricKey() throws NoSuchAlgorithmException {
-        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
-        keyGenerator.init(256);
-        return keyGenerator.generateKey();
-    }
-
-    private static IvParameterSpec generateIv() {
-        byte[] iv = new byte[16];
-        new SecureRandom().nextBytes(iv);
-        return new IvParameterSpec(iv);
-    }
-
-    private static KeyPair generateAsymmetricKeyPair() throws NoSuchAlgorithmException {
-        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-        keyPairGenerator.initialize(2048);
-        return keyPairGenerator.generateKeyPair();
-    }
-
-    private static String encryptSymmetric(String plainText, SecretKey secretKey, IvParameterSpec iv) throws Exception {
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey, iv);
-        byte[] encrypted = cipher.doFinal(plainText.getBytes());
-        return Base64.getEncoder().encodeToString(encrypted);
-
-    }
-
-    private static String decryptSymmetric(String cipherText, SecretKey secretKey, IvParameterSpec iv) throws Exception {
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, iv);
-        byte[] decrypted = cipher.doFinal(Base64.getDecoder().decode(cipherText));
-        return new String(decrypted);
-    }
-
-    private static String encryptAsymmetric(String plainText, PublicKey publicKey) throws Exception {
-        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-        byte[] encrypted = cipher.doFinal(plainText.getBytes());
-        return Base64.getEncoder().encodeToString(encrypted);
-    }
-    private static boolean isBase64(String input) {
-        String base64Regex = "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$";
-        return input.matches(base64Regex);
-    }
-
-    private static String decryptAsymmetric(String cipherText, PrivateKey privateKey) throws Exception {
-        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-        cipher.init(Cipher.DECRYPT_MODE, privateKey);
-        byte[] decrypted = cipher.doFinal(Base64.getDecoder().decode(cipherText));
-        return new String(decrypted);
-    }
-
-
 }
+
+
+
