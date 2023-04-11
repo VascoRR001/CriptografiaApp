@@ -103,7 +103,13 @@ public class CryptographyMethods {
         return signature.verify(signatureData);
     }
 
-
+    public static void juntarArquivos(File arquivo1, File arquivo2) throws IOException {
+        File outputFile = new File("output_joined.tar");
+        try (FileOutputStream outputStream = new FileOutputStream(outputFile, true)) {
+            Files.copy(arquivo1.toPath(), outputStream);
+            Files.copy(arquivo2.toPath(), outputStream);
+        }
+    }
 
 
 

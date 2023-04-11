@@ -1,17 +1,14 @@
 import Methods.CryptographyMethods;
 
-import java.security.*;
-import java.util.Base64;
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.swing.*;
-
-//import para o hashing
-import javax.swing.JButton;
-import java.security.MessageDigest;
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Base64;
 
 public class CriptografiaApp {
@@ -103,6 +100,21 @@ public class CriptografiaApp {
         JButton hashButton = new JButton("Hash");
         hashButton.setBounds(135, 100, 100, 25);
         panel.add(hashButton);
+
+        JButton btnSelecionarArquivo1 = new JButton("Selecionar Arquivo 1");
+        btnSelecionarArquivo1.setBounds(10, 10, 200, 25);
+
+        JButton btnSelecionarArquivo2 = new JButton("Selecionar Arquivo 2");
+        btnSelecionarArquivo2.setBounds(10, 60, 200, 25);
+
+        JTextField txtArquivo1 = new JTextField();
+        txtArquivo1.setBounds(10, 36, 314, 20);
+
+        JTextField txtArquivo2 = new JTextField();
+        txtArquivo2.setBounds(10, 88, 314, 20);
+
+        JButton btnJuntar = new JButton("Juntar");
+        btnJuntar.setBounds(100, 130, 120, 23);
 
         /*----------------Eventos para butoes----------------*/
         hashButton.addActionListener(e -> {
@@ -201,6 +213,69 @@ public class CriptografiaApp {
             } catch (Exception ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(frame, "Erro ao assinar a mensagem.", "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+
+
+
+        joinFilesMenuItem.addActionListener(e->{
+
+            JFrame newframe = new JFrame("Painel para arquivos");
+            newframe.setBounds(100, 100, 350, 250);
+            newframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            newframe.getContentPane().setLayout(null);
+
+            newframe.setVisible(true);
+
+
+            newframe.getContentPane().add(btnSelecionarArquivo1);
+
+            newframe.getContentPane().add(btnSelecionarArquivo2);
+
+
+            newframe.getContentPane().add(txtArquivo1);
+            txtArquivo1.setColumns(10);
+
+
+            newframe.getContentPane().add(txtArquivo2);
+            txtArquivo2.setColumns(10);
+
+            newframe.getContentPane().add(btnJuntar);
+
+            btnSelecionarArquivo1.addActionListener(e1-> {
+
+                    JFileChooser fileChooser = new JFileChooser();
+                    int returnValue = fileChooser.showOpenDialog(null);
+                    if (returnValue == JFileChooser.APPROVE_OPTION) {
+                        File selectedFile = fileChooser.getSelectedFile();
+                        txtArquivo1.setText(selectedFile.getAbsolutePath());
+                    }
+
+            });
+
+
+            btnSelecionarArquivo2.addActionListener(e2->{
+                    JFileChooser fileChooser = new JFileChooser();
+                    int returnValue = fileChooser.showOpenDialog(null);
+                    if (returnValue == JFileChooser.APPROVE_OPTION) {
+                        File selectedFile = fileChooser.getSelectedFile();
+                        txtArquivo2.setText(selectedFile.getAbsolutePath());
+                    }
+
+            });
+
+
+
+            File arquivo1 = new File(txtArquivo1.getText());
+            File arquivo2 = new File(txtArquivo2.getText());
+            
+            try {
+                CryptographyMethods.juntarArquivos(arquivo1, arquivo2);
+                JOptionPane.showMessageDialog(frame, "Arquivos juntados com sucesso!");
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(frame, "Erro ao juntar arquivos.", "Erro", JOptionPane.ERROR_MESSAGE);
             }
         });
 
