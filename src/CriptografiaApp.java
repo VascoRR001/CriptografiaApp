@@ -266,17 +266,18 @@ public class CriptografiaApp {
             });
 
 
+           btnJuntar.addActionListener(e3->{
+               File arquivo1 = new File(txtArquivo1.getText());
+               File arquivo2 = new File(txtArquivo2.getText());
 
-            File arquivo1 = new File(txtArquivo1.getText());
-            File arquivo2 = new File(txtArquivo2.getText());
-            
-            try {
-                CryptographyMethods.juntarArquivos(arquivo1, arquivo2);
-                JOptionPane.showMessageDialog(frame, "Arquivos juntados com sucesso!");
-            } catch (IOException ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(frame, "Erro ao juntar arquivos.", "Erro", JOptionPane.ERROR_MESSAGE);
-            }
+               try {
+                   CryptographyMethods.juntarArquivos(arquivo1, arquivo2);
+                   JOptionPane.showMessageDialog(frame, "Arquivos juntados com sucesso!");
+               } catch (IOException ex) {
+                   ex.printStackTrace();
+                   JOptionPane.showMessageDialog(frame, "Erro ao juntar arquivos.", "Erro", JOptionPane.ERROR_MESSAGE);
+               }
+           });
         });
 
 

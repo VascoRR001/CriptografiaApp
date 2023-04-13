@@ -111,28 +111,4 @@ public class CryptographyMethods {
         }
     }
 
-
-
-
-
-    /* public static void createTarFile(List<File> files, File outputFile) throws IOException {
-        try (OutputStream outputStream = new FileOutputStream(outputFile);
-             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream);
-             TarArchiveOutputStream tarArchiveOutputStream = new TarArchiveOutputStream(bufferedOutputStream)) {
-
-            for (File file : files) {
-                TarArchiveEntry entry = new TarArchiveEntry(file, file.getName());
-                tarArchiveOutputStream.putArchiveEntry(entry);
-
-                try (InputStream inputStream = new FileInputStream(file);
-                     BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream)) {
-
-                    IOUtils.copy(bufferedInputStream, tarArchiveOutputStream);
-                }
-
-                tarArchiveOutputStream.closeArchiveEntry();
-            }
-        }
-    }*/
-
 }
